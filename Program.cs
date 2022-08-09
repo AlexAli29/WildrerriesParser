@@ -1,24 +1,19 @@
 ﻿using IronXL;
 using System.Net.Http.Json;
 using WildrerriesParser.Model;
-using Microsoft.Office.Interop.Excel;
-
 
 
 using (var client = new HttpClient())
-{
-    
-    string filePathKeys = Path.Combine(Directory.GetCurrentDirectory(),@"Keys.txt");
+{    
+    string filePathKeys = "Keys.txt";
     List<string> keys = new List<string>();
-    keys = File.ReadAllLines(filePathKeys).ToList();    
+    keys = File.ReadAllLines(filePathKeys).ToList();
 
     var workbook = WorkBook.Create(ExcelFileFormat.XLSX);
-    workbook.Metadata.Title = "parsed.xlsx";    
-      
+    workbook.Metadata.Title = "parsed.xlsx";
 
     foreach (var key in keys)
     {
-
         WorkSheet sheet = workbook.CreateWorkSheet($"{key}");
         sheet[$"A{1}"].Value ="Title";
         sheet[$"B{1}"].Value = "Brand";
@@ -36,18 +31,13 @@ using (var client = new HttpClient())
         var json = await result.Content.ReadFromJsonAsync<WbResponse>();
         int i = 2;
         foreach (var product in json.Data.Products)
-        {         
-            
+        {            
             sheet[$"A{i}"].Value = product.Name;
             sheet[$"B{i}"].Value = product.Brand;
             sheet[$"C{i}"].Value = product.Id;
             sheet[$"D{i}"].Value = product.Feedbacks;
             sheet[$"E{i++}"].Value = product.PriceU;
-
-
-
-        }
-        
+        }        
     }
     workbook.SaveAs("parsed.xlsx");
     Console.WriteLine("Parsing executed!");
